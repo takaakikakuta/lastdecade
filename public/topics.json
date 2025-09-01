@@ -1,0 +1,24 @@
+[
+  {
+    "slug": "topics1",
+    "title": "パパ活が会社にばれるとどうなる！？",
+    "excerpt": "パパ活とは何か、そして違法となるケースや注意点をわかりやすくまとめました。",
+    "cover": "https://lastdecade.s3.ap-northeast-1.amazonaws.com/topic/article1/LD_Topics1.png",
+    "date": "2025-08-19",
+    "tags": ["パパ活", "法律", "違法性","身バレ"],
+    "category": "注意点",
+    "readMinutes": 12,
+    "author": "編集部",
+    "words": 5200
+  },
+  {
+    "slug": "topics2",
+    "title": "条件交渉するベストのタイミングは？",
+    "excerpt": "トラブルを避けるために知っておきたい注意点。",
+    "cover": "https://lastdecade.s3.ap-northeast-1.amazonaws.com/topic/topic2/LD_Topics2.png",
+    "date": "2025-08-12",
+    "category": "リスク対策",
+    "tags": ["注意点", "体験談"],
+    "words": 1000
+  }
+]

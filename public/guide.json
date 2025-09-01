@@ -1,0 +1,24 @@
+[
+  {
+    "slug": "papakatsu_illegality",
+    "title": "パパ活の定義と違法性について解説",
+    "excerpt": "パパ活とは何か、そして違法となるケースや注意点をわかりやすくまとめました。",
+    "cover": "https://lastdecade.s3.ap-northeast-1.amazonaws.com/topic/article1/post-8462.jpg",
+    "date": "2025-08-19",
+    "tags": ["パパ活", "法律", "違法性"],
+    "category": "注意点",
+    "readMinutes": 12,
+    "author": "編集部",
+    "words": 5200
+  },
+  {
+    "slug": "risk-tips",
+    "title": "パパ活で気をつけるべきリスクと対策",
+    "excerpt": "トラブルを避けるために知っておきたい注意点。",
+    "cover": "/images/guide2.jpg",
+    "date": "2025-08-12",
+    "category": "リスク対策",
+    "tags": ["注意点", "体験談"],
+    "words": 1000
+  }
+]
