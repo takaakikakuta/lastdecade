@@ -19,7 +19,7 @@ export type InterviewPost = {
   title: string;
   excerpt?: string;
   thumbnail?: string;
-  video?: string;    // 今回は使わない
+  video?: string; // 今回は使わない
   date?: string;
   tags?: string[];
   category?: string;
@@ -33,10 +33,10 @@ async function loadPosts(): Promise<InterviewPost[]> {
   const file = path.join(process.cwd(), "public", "interviews.json");
   try {
     const buf = await fs.readFile(file, "utf-8");
-    const data = JSON.parse(buf) as InterviewPost[] | unknown;
+    const data = JSON.parse(buf) as unknown;
     if (!Array.isArray(data)) return [];
     // 日付降順で揃えておく
-    return [...data].sort((a, b) => {
+    return [...(data as InterviewPost[])].sort((a, b) => {
       const ta = a.date ? +new Date(a.date) : 0;
       const tb = b.date ? +new Date(b.date) : 0;
       return tb - ta;
@@ -59,19 +59,23 @@ function buildQuery(base: URLSearchParams, patch: Record<string, string | undefi
   return `?${next.toString()}`;
 }
 
+type SP = { q?: string; cat?: string; page?: string };
+
+// ★ Next.js 15 では searchParams が Promise なので async/await で受ける
 export default async function Page({
   searchParams,
 }: {
-  searchParams?: { q?: string; cat?: string; page?: string };
+  searchParams?: Promise<SP>;
 }) {
-  const q = (searchParams?.q ?? "").toString().trim().toLowerCase();
-  const cat = (searchParams?.cat ?? "すべて").toString();
-  const page = Math.max(1, parseInt(searchParams?.page ?? "1", 10) || 1);
+  const sp = (await searchParams) ?? {};
+  const q = (sp.q ?? "").toString().trim().toLowerCase();
+  const cat = (sp.cat ?? "すべて").toString();
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
 
   const posts = await loadPosts();
 
   // カテゴリ一覧
-  const categories = ["すべて", ...uniq(posts.map(p => p.category).filter(Boolean) as string[])];
+  const categories = ["すべて", ...uniq(posts.map((p) => p.category).filter(Boolean) as string[])];
 
   // フィルタ
   const filtered = posts.filter((p) => {
@@ -89,23 +93,7 @@ export default async function Page({
   const start = (currentPage - 1) * PAGE_SIZE;
   const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
-  // サイドバー用（任意：最近の投稿・タグ）
-  const recentItems = posts.slice(0, 6).map((p) => ({
-    slug: p.slug,
-    title: p.title,
-    date: p.date,
-    thumbnail: p.thumbnail,
-    hrefBase: "/interviews",
-  }));
-  const tagCounts = (() => {
-    const m = new Map<string, number>();
-    posts.forEach((p) => (p.tags ?? []).forEach((t) => m.set(t, (m.get(t) ?? 0) + 1)));
-    return Array.from(m.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 12)
-      .map(([tag, count]) => ({ tag, count }));
-  })();
-
+  // 検索・カテゴリ維持用
   const baseParams = new URLSearchParams();
   if (q) baseParams.set("q", q);
   if (cat && cat !== "すべて") baseParams.set("cat", cat);
@@ -120,9 +108,7 @@ export default async function Page({
             <h1 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl">
               インタビュー
             </h1>
-            <p className="mt-1 text-sm text-neutral-600">
-              編集部が収録したインタビュー一覧。
-            </p>
+            <p className="mt-1 text-sm text-neutral-600">編集部が収録したインタビュー一覧。</p>
           </div>
 
           {/* 検索（GET） */}
@@ -157,14 +143,14 @@ export default async function Page({
             {/* カテゴリタブ（リンク） */}
             <div className="mb-5 flex flex-wrap gap-2">
               {categories.map((c) => {
-                const sp = new URLSearchParams(baseParams);
+                const sp2 = new URLSearchParams(baseParams);
                 if (c === "すべて") {
-                  sp.delete("cat");
+                  sp2.delete("cat");
                 } else {
-                  sp.set("cat", c);
+                  sp2.set("cat", c);
                 }
-                sp.delete("page");
-                const href = `?${sp.toString()}`;
+                sp2.delete("page");
+                const href = `?${sp2.toString()}`;
                 const active = cat === c || (c === "すべて" && !baseParams.get("cat"));
                 return (
                   <Link
@@ -234,7 +220,7 @@ export default async function Page({
           </div>
 
           {/* サイドバー 1/3（使い回し例） */}
-          <SideBar className="lg:col-span-1"/>
+          <SideBar className="lg:col-span-1" />
         </div>
       </main>
     </>
