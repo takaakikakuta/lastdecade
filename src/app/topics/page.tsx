@@ -27,10 +27,10 @@ async function loadPosts(): Promise<GuidePost[]> {
   const file = path.join(process.cwd(), "public", "topics.json");
   try {
     const buf = await fs.readFile(file, "utf-8");
-    const data = JSON.parse(buf) as GuidePost[];
+    const data = JSON.parse(buf) as unknown;
     if (!Array.isArray(data)) return [];
     // 新しい順にソート
-    return [...data].sort((a, b) => {
+    return [...(data as GuidePost[])].sort((a, b) => {
       const ta = a.date ? +new Date(a.date) : 0;
       const tb = b.date ? +new Date(b.date) : 0;
       return tb - ta;
@@ -53,14 +53,18 @@ function buildQuery(base: URLSearchParams, patch: Record<string, string | undefi
   return `?${next.toString()}`;
 }
 
+type SP = { q?: string; cat?: string; page?: string };
+
 export default async function Page({
   searchParams,
 }: {
-  searchParams?: { q?: string; cat?: string; page?: string };
+  // ★ Next.js 15: searchParams は Promise
+  searchParams?: Promise<SP>;
 }) {
-  const q = (searchParams?.q ?? "").trim().toLowerCase();
-  const cat = (searchParams?.cat ?? "すべて").toString();
-  const page = Math.max(1, parseInt(searchParams?.page ?? "1", 10) || 1);
+  const sp = (await searchParams) ?? {};
+  const q = (sp.q ?? "").trim().toLowerCase();
+  const cat = (sp.cat ?? "すべて").toString();
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
 
   const posts = await loadPosts();
 
@@ -131,11 +135,11 @@ export default async function Page({
             {/* カテゴリタブ */}
             <div className="mb-5 flex flex-wrap gap-2">
               {categories.map((c) => {
-                const sp = new URLSearchParams(baseParams);
-                if (c === "すべて") sp.delete("cat");
-                else sp.set("cat", c);
-                sp.delete("page");
-                const href = `?${sp.toString()}`;
+                const sp2 = new URLSearchParams(baseParams);
+                if (c === "すべて") sp2.delete("cat");
+                else sp2.set("cat", c);
+                sp2.delete("page");
+                const href = `?${sp2.toString()}`;
                 const active = cat === c || (c === "すべて" && !baseParams.get("cat"));
                 return (
                   <Link
@@ -246,11 +250,16 @@ function GuideCard({ post }: { post: GuidePost }) {
         <h3 className="line-clamp-2 text-base font-semibold leading-snug text-neutral-900">
           {post.title}
         </h3>
-        {post.excerpt && <p className="mt-1 line-clamp-2 text-sm text-neutral-600">{post.excerpt}</p>}
+        {post.excerpt && (
+          <p className="mt-1 line-clamp-2 text-sm text-neutral-600">{post.excerpt}</p>
+        )}
         {post.tags && post.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {post.tags.map((t) => (
-              <span key={t} className="rounded-md bg-neutral-100 px-2 py-0.5 text-[11px] text-neutral-700">
+              <span
+                key={t}
+                className="rounded-md bg-neutral-100 px-2 py-0.5 text-[11px] text-neutral-700"
+              >
                 #{t}
               </span>
             ))}
