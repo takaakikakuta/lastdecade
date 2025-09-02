@@ -21,7 +21,7 @@ export type GuidePost = {
   words?: number;
 };
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 10;
 
 async function loadPosts(): Promise<GuidePost[]> {
   const file = path.join(process.cwd(), "public", "topics.json");

@@ -1,84 +1,99 @@
-import ArticleCard from "@/components/ArticleCard";
-import Guide from "@/components/Guide";
+// app/(site)/page.tsx など：ホーム（Server Component 前提）
+import path from "node:path";
+import fs from "node:fs/promises";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Interview, { InterviewItem } from "@/components/Interview";
+import Guide from "@/components/Guide";
 import { getAllPostsMeta } from "@/lib/mdx";
 
 export const dynamic = "force-static";
+export const revalidate = 3600; // topics.jsonを1時間ごとに取り直す
 
-export default function HomePage() {
+// topics.jsonの型（必要なら共通型に寄せてもOK）
+type TopicPost = {
+  slug: string;
+  title: string;
+  cover?: string;
+  date?: string;
+};
+
+type InterViewPost = {
+  slug: string;
+  title: string;
+  thumbnail?: string;
+  date?: string;
+};
+
+// ★ このホーム用にローダーを用意（loadPostsの代わり）
+async function loadTopicPosts(): Promise<TopicPost[]> {
+  const file = path.join(process.cwd(), "public", "topics.json");
+  try {
+    const buf = await fs.readFile(file, "utf-8");
+    const data = JSON.parse(buf) as unknown;
+    if (!Array.isArray(data)) return [];
+    // 新しい順
+    return [...(data as TopicPost[])].sort((a, b) => {
+      const ta = a.date ? +new Date(a.date) : 0;
+      const tb = b.date ? +new Date(b.date) : 0;
+      return tb - ta;
+    });
+  } catch {
+    return [];
+  }
+}
+
+async function loadInterviewPosts(): Promise<InterViewPost[]> {
+  const file = path.join(process.cwd(), "public", "interviews.json");
+  try {
+    const buf = await fs.readFile(file, "utf-8");
+    const data = JSON.parse(buf) as unknown;
+    if (!Array.isArray(data)) return [];
+    // 新しい順
+    return [...(data as TopicPost[])].sort((a, b) => {
+      const ta = a.date ? +new Date(a.date) : 0;
+      const tb = b.date ? +new Date(b.date) : 0;
+      return tb - ta;
+    });
+  } catch {
+    return [];
+  }
+}
+
+const PLACEHOLDER = "/images/placeholder-16x9.jpg";
+
+export default async function HomePage() {
+  // 既存MDX側（必要ならそのまま）
   const posts = getAllPostsMeta();
-  const [featured, ...rest] = posts;
-  const latest = rest.slice(0, 6);
+  const [_featured, ...rest] = posts;
+  const latest = rest.slice(0, 6); // 未使用なら削除OK
 
-  const dummyItems: InterviewItem[] = [
-  {
-    slug: "first-meal-experience",
-    title: "初めての食事パパ活体験談 ― 緊張と学び",
-    thumbnail: "https://lastdecade.s3.ap-northeast-1.amazonaws.com/dummy/dummy1.png",
-    date: "2025-08-15",
-  },
-  {
-    slug: "luxury-gift-story",
-    title: "ブランドバッグをもらった夜の話",
-    thumbnail: "https://lastdecade.s3.ap-northeast-1.amazonaws.com/dummy/dummy2.png",
-    date: "2025-08-12",
-  },
-  {
-    slug: "weird-daddy-encounter",
-    title: "ちょっと変わったパパに出会った体験談",
-    thumbnail: "https://lastdecade.s3.ap-northeast-1.amazonaws.com/dummy/dummy3.png",
-    date: "2025-08-10",
-  },
-  {
-    slug: "balance-study-and-daddy",
-    title: "学業とパパ活を両立する方法",
-    thumbnail: "https://lastdecade.s3.ap-northeast-1.amazonaws.com/dummy/dummy4.png",
-    date: "2025-08-05",
-  },
-];
+  // ★ ここで topics.json を取得して Guide 用データに変換
+  const topics = await loadTopicPosts();
+  const guideItems: InterviewItem[] = topics.slice(0, 4).map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    thumbnail: p.cover ?? PLACEHOLDER,
+    date: p.date ?? "",
+  }));
 
-const dummArticlee: InterviewItem[] = [
-  {
-    slug: "first-meal-experience",
-    title: "パパ活は犯罪になるの",
-    thumbnail: "https://lastdecade.s3.ap-northeast-1.amazonaws.com/dummy/dummy1.png",
-    date: "2025-08-15",
-  },
-  {
-    slug: "お手当の相場は？",
-    title: "ブランドバッグをもらった夜の話",
-    thumbnail: "https://lastdecade.s3.ap-northeast-1.amazonaws.com/dummy/dummy2.png",
-    date: "2025-08-12",
-  },
-  {
-    slug: "weird-daddy-encounter",
-    title: "どんな人がパパ活しているの？（女性編）",
-    thumbnail: "https://lastdecade.s3.ap-northeast-1.amazonaws.com/dummy/dummy3.png",
-    date: "2025-08-10",
-  },
-  {
-    slug: "balance-study-and-daddy",
-    title: "どんな人がパパ活しているの？（男性編）",
-    thumbnail: "https://lastdecade.s3.ap-northeast-1.amazonaws.com/dummy/dummy4.png",
-    date: "2025-08-05",
-  },
-];
+  const interviews = await loadInterviewPosts();
+  const interviewItems: InterviewItem[] = interviews.slice(0, 4).map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    thumbnail: p.thumbnail ?? PLACEHOLDER,
+    date: p.date ?? "",
+  }));
+
+  console.log(interviewItems);
   
-
-  // 人気タグを雑に集計（上位10件）
-  const tagCount = new Map<string, number>();
-  posts.forEach((p) => (p.tags || []).forEach((t) => tagCount.set(t, (tagCount.get(t) || 0) + 1)));
-  const popularTags = Array.from(tagCount.entries()).sort((a, b) => b[1] - a[1]).slice(0, 10);
 
   return (
     <>
-    <Header/>
-    <Hero/>
-    <Interview items={dummyItems}/>
-    <Guide items={dummArticlee}/>
-    
+      <Header />
+      <Hero />
+      <Interview items={interviewItems} />
+      <Guide items={guideItems} />
     </>
   );
 }

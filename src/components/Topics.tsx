@@ -15,7 +15,7 @@ export type InterviewItem = {
   date?: string;  // ISO 文字列想定
 };
 
-export default function Guide({ items }: { items: InterviewItem[] }) {
+export default function Topics({ items }: { items: InterviewItem[] }) {
   const sorted = [...(items || [])].sort((a, b) => {
     const ta = a.date ? +new Date(a.date) : 0;
     const tb = b.date ? +new Date(b.date) : 0;
