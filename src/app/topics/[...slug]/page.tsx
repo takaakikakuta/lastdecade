@@ -38,9 +38,10 @@ export async function generateStaticParams() {
 export default async function ArticlePage({
   params,
 }: {
-  params: { slug: string[] };
+  // ★ Next.js 15 では Promise で来る
+  params: Promise<{ slug: string[] }>;
 }) {
-  const slugArray = params.slug;
+  const { slug: slugArray } = await params; // ← ここを await
 
   // ✅ 配列を join してファイルパスを作る
   const filePath = path.join(CONTENT_DIR, ...slugArray) + ".mdx";
@@ -52,31 +53,29 @@ export default async function ArticlePage({
 
   // MDXコンパイル
   const { content: mdxContent } = await compileMDX({
-  source: content,
-  components: { CalloutList, AppCompareTable, InlineToc, Image}, // ← ここが大事！
-  options: { parseFrontmatter: false },
+    source: content,
+    components: { CalloutList, AppCompareTable, InlineToc, Image }, // MDX内で使用可
+    options: { parseFrontmatter: false },
   });
 
   return (
-  <>
-    <Header />
-    <div className="container mx-auto px-4 py-8">
-      <Breadcrumbs baseHref="/" className="mb-4" />
+    <>
+      <Header />
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumbs baseHref="/" className="mb-4" />
 
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold">
-          {typeof data?.title === "string" ? data.title : slugArray.at(-1)}
-        </h1>
-        {typeof data?.date === "string" && (
-          <time className="block text-sm text-zinc-500 mt-1">{data.date}</time>
-        )}
-      </header>
+        <header className="mb-6">
+          <h1 className="text-3xl font-bold">
+            {typeof data?.title === "string" ? data.title : slugArray.at(-1)}
+          </h1>
+          {typeof data?.date === "string" && (
+            <time className="block text-sm text-zinc-500 mt-1">{data.date}</time>
+          )}
+        </header>
 
-      {/* ✅ prose の内側に MDX 本文（React要素）をそのまま差し込む */}
-      <article className="prose prose-zinc max-w-none">
-        {mdxContent}
-      </article>
-    </div>
-  </>
-);
+        {/* ✅ prose の内側に MDX 本文（React要素）をそのまま差し込む */}
+        <article className="prose prose-zinc max-w-none">{mdxContent}</article>
+      </div>
+    </>
+  );
 }
