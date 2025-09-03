@@ -3,60 +3,47 @@ import Link from "next/link";
 import Image from "next/image";
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
 
 export type Article = {
   slug: string;
   title: string;
   date?: string;
-  thumbnail?: string;
+  excerpt?: string;
+  cover?: string;       // ← JSONのキーに合わせる（サムネ）
   views?: number;
 };
 
-const CONTENT_DIR = path.join(process.cwd(), "src", "content", "articles");
+const TOPICS_JSON = path.join(process.cwd(), "public", "topics.json");
 
-// content/articles 配下から記事一覧を読み込む（サブディレクトリ対応）
-function getArticles() {
-  if (!fs.existsSync(CONTENT_DIR)) return [];
+function getArticles(): Article[] {
+  if (!fs.existsSync(TOPICS_JSON)) return [];
 
-  const walk = (dir: string, base = ""): any[] => {
-    return fs.readdirSync(dir).flatMap((file) => {
-      const full = path.join(dir, file);
-      const rel = path.join(base, file);
-      if (fs.statSync(full).isDirectory()) {
-        return walk(full, rel);
-      }
-      if (file.endsWith(".mdx")) {
-        const raw = fs.readFileSync(full, "utf-8");
-        const { data } = matter(raw);
-        return [
-          {
-            slug: rel.replace(/\\.mdx$/, ""),
-            title: data.title || file.replace(/\\.mdx$/, ""),
-            excerpt: data.excerpt || "",
-            date: data.date || "",
-          },
-        ];
-      }
-      return [];
-    });
-  };
+  const raw = fs.readFileSync(TOPICS_JSON, "utf-8");
+  const list = JSON.parse(raw) as any[];
 
-  return walk(CONTENT_DIR).sort(
-    (a, b) => +new Date(b.date) - +new Date(a.date)
-  );
+  // JSONのキー → Article に合わせて整形
+  const items: Article[] = list.map((a) => ({
+    slug: a.slug,
+    title: a.title,
+    date: a.date ?? "",
+    excerpt: a.excerpt ?? "",
+    cover: a.cover ?? "",
+    views: a.views, // JSONに無ければ undefined のままでOK
+  }));
+
+  // 新しい順にソート
+  return items.sort((a, b) => +new Date(b.date ?? 0) - +new Date(a.date ?? 0));
 }
 
-export default function SideBar({
-  className = "",
-}: {
-  className?: string;
-}) {
-
-      const articles = getArticles();
+export default function SideBar({ className = "" }: { className?: string }) {
+  const articles = getArticles();
   const recent = articles.slice(0, 6);
   const popular = [...articles]
-    .sort((a, b) => (b.views ?? 0) - (a.views ?? 0) || +new Date(b.date || 0) - +new Date(a.date || 0))
+    .sort(
+      (a, b) =>
+        (b.views ?? 0) - (a.views ?? 0) ||
+        +new Date(b.date ?? 0) - +new Date(a.date ?? 0)
+    )
     .slice(0, 6);
 
   return (
@@ -68,8 +55,13 @@ export default function SideBar({
           {recent.map((a) => (
             <li key={a.slug} className="flex gap-3">
               <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
-                {a.thumbnail ? (
-                  <Image src={a.thumbnail} alt={a.title} fill sizes="48px" className="object-cover" />
+                {a.cover ? (
+                  <Image
+                    src={a.cover}
+                    alt={a.title}
+                    fill
+                    className="object-cover"
+                  />
                 ) : (
                   <span className="absolute inset-0 grid place-items-center text-xs text-zinc-400">
                     No img
@@ -78,12 +70,15 @@ export default function SideBar({
               </div>
               <div className="min-w-0">
                 <Link
+                  // ルーティングに合わせて /articles か /topics に変更
                   href={`/articles/${a.slug}`}
                   className="line-clamp-2 hover:underline underline-offset-4"
                 >
                   {a.title}
                 </Link>
-                {a.date && <div className="text-xs text-zinc-500 mt-0.5">{a.date}</div>}
+                {a.date && (
+                  <div className="text-xs text-zinc-500 mt-0.5">{a.date}</div>
+                )}
               </div>
             </li>
           ))}
@@ -105,9 +100,7 @@ export default function SideBar({
                   {a.title}
                 </Link>
                 <div className="text-xs text-zinc-500">
-                  {typeof a.views === "number"
-                    ? `${a.views.toLocaleString()} views`
-                    : (a.date || "")}
+                  {typeof a.views === "number" ? `${a.views.toLocaleString()} views` : (a.date ?? "")}
                 </div>
               </div>
             </li>

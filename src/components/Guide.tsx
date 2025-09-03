@@ -48,7 +48,7 @@ function GuideCard({ item }: { item: InterviewItem }) {
 
   return (
     <Link
-      href={`/interviews/${item.slug}`}
+      href={`/topics/${item.slug}`}
       aria-label={item.title}
       className="group block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition"
     >

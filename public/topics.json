@@ -100,5 +100,15 @@
     "category": "コラム",
     "tags": ["パパ活", "大人の関係", "相場", "注意点"],
     "words": 1000
+  },
+  {
+    "slug": "topics11",
+    "title": "パパ活の食事代やホテル代は経費で落とせる？男性目線での税務リスク整理",
+    "excerpt": "男性がパパ活で支出する食事代やホテル代は経費で落とせるのか？交際費・旅費交通費としての扱いと注意点を整理しました。",
+    "cover": "https://lastdecade.s3.ap-northeast-1.amazonaws.com/topic/topics11/LD_Topics11.png",
+    "date": "2025-09-10",
+    "category": "コラム",
+    "tags": ["パパ活", "経費", "交際費", "男性向け"],
+    "words": 1000
   }
 ]

@@ -83,10 +83,7 @@ export default async function HomePage() {
     title: p.title,
     thumbnail: p.thumbnail ?? PLACEHOLDER,
     date: p.date ?? "",
-  }));
-
-  console.log(interviewItems);
-  
+  }));  
 
   return (
     <>
