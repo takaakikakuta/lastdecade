@@ -110,5 +110,25 @@
     "category": "コラム",
     "tags": ["パパ活", "経費", "交際費", "男性向け"],
     "words": 1000
+  },
+  {
+    "slug": "topics12",
+    "title": "月3〜5万円で考えるパパ活のリアル：できること・やめた方がいいこと・代替案",
+    "excerpt": "月3〜5万円の予算でパパ活を検討する人向けに、配分の目安、現実的な頻度、想定される制約、そしてキャバクラや風俗といった代替案までを、冷静に整理します。",
+    "cover": "https://lastdecade.s3.ap-northeast-1.amazonaws.com/topic/topics12/LD_Topics12.png",
+    "date": "2025-09-11",
+    "category": "コラム",
+    "tags": ["パパ活", "経費", "交際費", "男性向け"],
+    "words": 1000
+  },
+  {
+    "slug": "topics13",
+    "title": "シンママはパパ活の“隠れた相性良し”パートナー？男性目線で整理",
+    "excerpt": "シングルマザー（シンママ）は時間が限られる反面、目的や条件が明確で、短時間でも満足度の高い関係を築きやすい傾向があります。本記事ではメリット、注意点、リスクを整理します。",
+    "cover": "https://lastdecade.s3.ap-northeast-1.amazonaws.com/topic/topics13/LD_Topics13.png",
+    "date": "2025-09-12",
+    "category": "コラム",
+    "tags": ["パパ活", "シンママ", "実践ガイド", "男性向け"],
+    "words": 1000
   }
 ]

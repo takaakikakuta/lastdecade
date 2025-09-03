@@ -46,6 +46,19 @@ const defaultItems = [
     ],
     siteUrl: "https://example.com/paddy",
   },
+  {
+    id: "pappy",
+    rank: 3,
+    name: "パピィ",
+    rankingimg:"",
+    logo: "https://www21.a8.net/svt/bgt?aid=250903681955&wid=001&eno=01&mid=s00000009685004004000&mc=1",
+    rating: 4.3,
+    features: [
+      <>会員数<strong>130万人</strong></>,
+      <><strong>ドタキャン防止</strong>機能付き</>,
+    ],
+    siteUrl: "https://px.a8.net/svt/ejp?a8mat=45DQIP+FSKZHU+22QA+NU729",
+  },
 ];
 
 // ====== 型定義 ======
@@ -107,12 +120,14 @@ export default function AppCompareTable({
                         className="object-contain rounded-lg ring-1 ring-zinc-200 bg-white shadow-sm
                                 w-12 h-12 md:w-16 md:h-16" // ← スマホは48px, md以上は64px
                     />
-                    <img
+                   {it.rankingimg?.trim() && (
+                      <img
                         src={it.rankingimg}
                         alt={`${it.name} ranking`}
                         className="absolute -top-6 right-3 object-contain
-                                w-6 h-6 md:w-10 md:h-10 md:-top-9" // ← スマホは小さい
-                    />
+                                  w-6 h-6 md:w-10 md:h-10 md:-top-9"
+                      />
+                    )}
                 </div>
 
                 {/* 名前リンク */}
