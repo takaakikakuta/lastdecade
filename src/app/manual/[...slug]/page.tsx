@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Header from "@/components/Header";
 import InlineToc from "@/components/InlineToc";
+import AppCompareTable from "@/components/AppCompareTable";
 
 // 記事格納ディレクトリ
 const CONTENT_DIR = path.join(process.cwd(), "src", "content", "articles");
@@ -50,7 +51,7 @@ export default async function ArticlePage({
   // MDXコンパイル
   const { content: mdxContent } = await compileMDX({
     source: content,
-    components: { InlineToc }, // MDX内で <InlineToc /> を使えるようにする
+    components: { InlineToc,AppCompareTable }, // MDX内で <InlineToc /> を使えるようにする
     options: { parseFrontmatter: false },
   });
 

@@ -71,7 +71,7 @@ export default function SideBar({ className = "" }: { className?: string }) {
               <div className="min-w-0">
                 <Link
                   // ルーティングに合わせて /articles か /topics に変更
-                  href={`/articles/${a.slug}`}
+                  href={`/topics/${a.slug}`}
                   className="line-clamp-2 hover:underline underline-offset-4"
                 >
                   {a.title}
