@@ -21,7 +21,7 @@ const Header = () => {
         { label: "トピックス", href: "/topics" },
         { label: "パパ活実践ガイド", href: "/manual" },
         { label: "Q&A / 用語集", href: "/faq" },
-        { label: "お問い合わせ", href: "/contact" },
+        { label: "お問い合わせ", href: "https://docs.google.com/forms/d/e/1FAIpQLSeqeymmUVbw3i7pjzKD44yXPQ_0CB4wHzj2QezVaFP83p3e0w/viewform?usp=dialog" },
     ];
 
   return (
