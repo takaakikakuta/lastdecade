@@ -176,7 +176,7 @@ export default function Page() {
   return (
     <>
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto md:px-4 px-10 py-8">
         <Breadcrumbs baseHref="/manual" className="mb-4" />
 
         {/* スマホ1カラム / LG以上で本文2/3 + サイド1/3 */}
@@ -188,7 +188,7 @@ export default function Page() {
               パパ活初心者がまず読むべき基本知識と実践ステップをまとめました。各項目をクリックすると詳細記事に移動できます。
             </p>
 
-            <section className="not-prose rounded-2xl border bg-white p-5 shadow-sm my-6">
+            <section className="not-prose rounded-2xl bg-white p-5 my-6">
             <h2 className="text-xl font-semibold mb-3">準備編 パパ活を楽しむために</h2>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-0">
               {READY.items.map((item) => (
@@ -241,9 +241,12 @@ export default function Page() {
           </article>
 
           {/* ------ サイドバー（1/3） ------ */}
-          <SideBar
-            className="lg:col-span-1 lg:sticky lg:top-20 self-start"
-          />
+          <div>
+            <SideBar
+              className="lg:col-span-1 lg:top-20 self-start"
+            />
+
+          </div>
         </div>
       </main>
     </>

@@ -9,7 +9,9 @@ import Header from "@/components/Header";
 import CalloutList from "@/components/CalloutList";
 import AppCompareTable from "@/components/AppCompareTable";
 import Image from "next/image";
+import CleanOjiAffiliateCard from "@/components/adComponent/CleanOjiAffiliateCard";
 import InlineToc from "@/components/InlineToc";
+import ManualSectionsSidebar from "@/components/ManualSectionsSidebar";
 
 // 記事格納ディレクトリ
 const CONTENT_DIR = path.join(process.cwd(), "src", "content", "topics");
@@ -54,7 +56,7 @@ export default async function ArticlePage({
   // MDXコンパイル
   const { content: mdxContent } = await compileMDX({
     source: content,
-    components: { CalloutList, AppCompareTable, InlineToc, Image }, // MDX内で使用可
+    components: { CalloutList, AppCompareTable, InlineToc, CleanOjiAffiliateCard, Image }, // MDX内で使用可
     options: { parseFrontmatter: false },
   });
 
@@ -73,8 +75,10 @@ export default async function ArticlePage({
           )}
         </header>
 
-        {/* ✅ prose の内側に MDX 本文（React要素）をそのまま差し込む */}
-        <article className="prose prose-zinc max-w-none">{mdxContent}</article>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <article className="prose prose-zinc max-w-none lg:col-span-2">{mdxContent}</article>
+          <ManualSectionsSidebar/>
+        </div>
       </div>
     </>
   );

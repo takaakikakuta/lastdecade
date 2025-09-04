@@ -5,6 +5,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import Header from "@/components/Header";
 import SideBar from "@/components/SideBar";
+import ManualSectionsSidebar from "@/components/ManualSectionsSidebar";
 
 export const revalidate = 3600; // 1時間ごとにISR更新
 
@@ -205,7 +206,10 @@ export default async function Page({
           </div>
 
           {/* サイドバー */}
-          <SideBar className="lg:col-span-1" />
+          <div>
+            <ManualSectionsSidebar/>
+
+          </div>
         </div>
       </main>
     </>

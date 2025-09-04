@@ -30,17 +30,17 @@ export default function Hero() {
             <div className="md:w-2/3 w-full">
 
                 {/* badge */}
-                <div className="mb-4 inline-flex max-w-fit items-center gap-2 rounded-full border border-white/40 bg-white/20 px-3 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-sm whitespace-nowrap">
+                {/* <div className="mb-4 inline-flex max-w-fit items-center gap-2 rounded-full border border-white/40 bg-white/20 px-3 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-sm whitespace-nowrap">
                 <span className="inline-block h-2 w-2 rounded-full bg-white" />
                 匿名性に配慮した実録インタビュー
-                </div>
+                </div> */}
 
                 {/* headline */}
                 <h1 className="max-w-4xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
-                エレガントに語られる、大人のリアル。
+                最後ではない、最高の10年にしよう。
                 </h1>
                 <p className="mt-4 max-w-2xl text-sm leading-6 text-neutral-100 sm:text-base">
-                LastDecadeは、体験者の安全と匿名性を最優先に、パパ活の実態を丁寧に編集して届けるメディアです。インタビュー、実践ガイド、リスク対策まで、深く・上品に。
+                LastDecadeは、体験者の安全と匿名性を最優先に、パパ活の実態を丁寧に編集して届けるメディアです。
                 </p>
 
                 {/* CTAs */}
@@ -51,10 +51,16 @@ export default function Hero() {
                 >
                     インタビュー動画を見る
                 </Link>
+                <Link
+                    href="/manual"
+                    className="inline-flex items-center justify-center rounded-2xl border border-white/50 bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-white"
+                >
+                    パパ活実践ガイド
+                </Link>
                 </div>
 
                 {/* key points */}
-                <ul className="mt-8 grid max-w-3xl grid-cols-1 gap-3 text-sm text-white sm:grid-cols-3">
+                {/* <ul className="mt-8 grid max-w-3xl grid-cols-1 gap-3 text-sm text-white sm:grid-cols-3">
                 <li className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-3 py-2 shadow-sm backdrop-blur-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
                     <path d="M4 12h16M4 6h16M4 18h16" />
@@ -74,12 +80,12 @@ export default function Hero() {
                     </svg>
                     取材同意と編集ガイドライン
                 </li>
-                </ul>
+                </ul> */}
 
                 {/* sub note */}
-                <p className="mt-4 max-w-2xl text-[12px] leading-5 text-neutral-200">
+                {/* <p className="mt-4 max-w-2xl text-[12px] leading-5 text-neutral-200">
                 ※ インタビューは本人同意のうえ、匿名加工（音声・映像の加工/伏字）を行っています。内容は編集方針に基づき、過度な扇情表現を排しています。
-                </p>
+                </p> */}
             </div>
            <div className="relative flex md:w-1/3 md:h-full w-full h-40"> {/* ← 高さ必須 */}
             <Image

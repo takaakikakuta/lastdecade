@@ -66,7 +66,7 @@ const Header = () => {
         {/* Right: Mobile hamburger */}
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-xl border px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 md:hidden"
+          className="inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 md:hidden"
           aria-label="メニューを開閉"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}

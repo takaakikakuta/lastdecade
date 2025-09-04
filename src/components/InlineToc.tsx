@@ -96,18 +96,18 @@ export default function InlineToc({
   if (numbered.length === 0) return null;
 
   return (
-    <aside className={`rounded-xl border-2 ${color.border} bg-white ring-1 ${color.ring} p-4 md:p-5`}>
+    <aside className={`rounded-xl border-2 ${color.border} bg-white ring-1 ${color.ring} p-4 md:p-2`}>
       <div className="text-center">
         <div className={`text-xl md:text-2xl font-semibold ${color.title}`}>{title}</div>
         <div className={`mt-3 border-b ${color.hr}`} />
       </div>
 
-      <nav className="mt-3 md:mt-4">
-        <ol className="space-y-3">
+      <nav className="mt-2 md:mt-4">
+        <ol className="space-y-0">
           {numbered
             .filter((h) => h.level === 2)
             .map((h2) => (
-              <li key={h2.id}>
+              <li key={h2.id} className="">
                 <a href={`#${h2.id}`} onClick={j(h2.id)} className="flex items-start gap-3 group">
                   <span className={`leading-relaxed underline-offset-4 group-hover:underline ${active === h2.id ? "text-zinc-900" : "text-zinc-700"}`}>
                     {h2.text}

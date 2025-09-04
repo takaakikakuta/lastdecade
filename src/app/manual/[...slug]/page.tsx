@@ -8,6 +8,9 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import Header from "@/components/Header";
 import InlineToc from "@/components/InlineToc";
 import AppCompareTable from "@/components/AppCompareTable";
+import LoveanComponent from "@/components/app/LoveanComponent";
+import SugarDaddyComponent from "@/components/app/SugarDaddyComponent";
+import SideBar from "@/components/SideBar";
 
 // 記事格納ディレクトリ
 const CONTENT_DIR = path.join(process.cwd(), "src", "content", "articles");
@@ -51,7 +54,7 @@ export default async function ArticlePage({
   // MDXコンパイル
   const { content: mdxContent } = await compileMDX({
     source: content,
-    components: { InlineToc,AppCompareTable }, // MDX内で <InlineToc /> を使えるようにする
+    components: { InlineToc,AppCompareTable, LoveanComponent, SugarDaddyComponent}, // MDX内で <InlineToc /> を使えるようにする
     options: { parseFrontmatter: false },
   });
 
@@ -70,8 +73,13 @@ export default async function ArticlePage({
           )}
         </header>
 
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* ✅ prose の内側に MDX 本文（React要素）をそのまま差し込む */}
-        <article className="prose prose-zinc max-w-none">{mdxContent}</article>
+        <article className="prose prose-zinc max-w-none lg:col-span-2">{mdxContent}</article>
+        <SideBar
+          className="lg:col-span-1 lg:top-20 self-start"
+        />
+      </div>
       </div>
     </>
   );

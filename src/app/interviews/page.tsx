@@ -108,7 +108,7 @@ export default async function Page({
             <h1 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl">
               インタビュー
             </h1>
-            <p className="mt-1 text-sm text-neutral-600">編集部が収録したインタビュー一覧。</p>
+            <p className="mt-1 text-sm text-neutral-600">インタビューは匿名性を担保するため、生成AIによる音声で製作しております。</p>
           </div>
 
           {/* 検索（GET） */}
