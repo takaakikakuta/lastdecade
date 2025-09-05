@@ -1,173 +1,102 @@
-import Image from "next/image";
+// app/interviews/[slug]/page.tsx
 import path from "node:path";
 import fs from "node:fs/promises";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import dynamic from "next/dynamic";
-import VideoWithCTAs from "./video-with-ctas";
-import Header from "@/components/Header";
 import SideBar from "@/components/SideBar";
+import Header from "@/components/Header";
+import MiniFooter from "@/components/Footer";
 
-export const revalidate = 3600; // 一覧と揃える
+export const revalidate = 3600;
 
-// ===== Types =====
-type AffiliateCTA = {
-  label: string;
-  href: string;
-  start?: number; // 秒
-  end?: number;   // 秒（省略時は動画末尾まで）
-};
-
-export type InterviewPost = {
+type Post = {
   slug: string;
-  title: string;
-  excerpt?: string;
-  thumbnail?: string;
+  title?: string;
   video?: string;
-  date?: string;
-  tags?: string[];
-  category?: string;
-  author?: string;
-  ctas?: AffiliateCTA[];
+  thumbnail?: string;
 };
 
-// ===== Data loader =====
-async function loadAll(): Promise<InterviewPost[]> {
+async function loadAll(): Promise<Post[]> {
   const file = path.join(process.cwd(), "public", "interviews.json");
   try {
     const buf = await fs.readFile(file, "utf-8");
-    const data = JSON.parse(buf) as unknown;
-    if (!Array.isArray(data)) return [];
-    // 念のため日付降順
-    return [...(data as InterviewPost[])].sort((a, b) => {
-      const ta = a.date ? +new Date(a.date) : 0;
-      const tb = b.date ? +new Date(b.date) : 0;
-      return tb - ta;
-    });
+    const list = JSON.parse(buf) as unknown;
+    return Array.isArray(list) ? (list as Post[]) : [];
   } catch {
     return [];
   }
 }
 
-async function loadBySlug(slug: string): Promise<InterviewPost | null> {
-  const list = await loadAll();
-  return list.find((p) => p.slug === slug) ?? null;
+async function loadBySlug(slug: string): Promise<Post | null> {
+  const all = await loadAll();
+  return all.find((p) => p.slug === slug) ?? null;
 }
 
-// ===== SSG: 動的ルートの事前生成（任意） =====
 export async function generateStaticParams() {
   const posts = await loadAll();
   return posts.map((p) => ({ slug: p.slug }));
 }
 
-// ===== SEO =====
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = await loadBySlug(params.slug);
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params;
+  const post = await loadBySlug(slug);
   if (!post) return {};
-  const title = post.title ? `${post.title} | インタビュー` : "インタビュー";
-  const desc = post.excerpt ?? "インタビュー";
+  const title = post.title ?? "Interview";
   const img = post.thumbnail ?? "/images/placeholder-16x9.jpg";
   return {
     title,
-    description: desc,
-    openGraph: {
-      title,
-      description: desc,
-      images: [{ url: img }],
-      type: "video.other",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description: desc,
-      images: [img],
-    },
+    openGraph: { title, images: [{ url: img }] },
+    twitter: { card: "summary_large_image", title, images: [img] },
   };
 }
 
-// ===== Client: Video + CTA overlay =====
-
-type SP = { t?: string };
+type SP = Record<string, string | string[] | undefined>;
 
 export default async function Page({
   params,
   searchParams,
 }: {
-  params: { slug: string };
-  // Next.js 15 では searchParams が Promise
+  params: Promise<{ slug: string }>;
   searchParams?: Promise<SP>;
 }) {
+  const { slug } = await params;
   const sp = (await searchParams) ?? {};
-  const startAt = Math.max(0, parseInt(sp.t ?? "0", 10) || 0);
+  const tStr = (Array.isArray(sp.t) ? sp.t[0] : sp.t) ?? "0";
+  const startAt = Math.max(0, parseInt(tStr, 10) || 0);
 
-  const post = await loadBySlug(params.slug);
-  if (!post || !post.video) {
-    notFound();
-  }
+  const post = await loadBySlug(slug);
+  if (!post || !post.video) notFound();
 
-  const dt = post.date ? new Date(post.date) : null;
+  const videoSrc = startAt > 0 ? `${post.video}#t=${startAt}` : post.video;
 
   return (
     <>
-    <Header/>
-    <main className="mx-auto container px-4 py-8">
-      <nav className="mb-4 text-sm text-neutral-600">
-        <Link href="/interviews" className="underline underline-offset-4 hover:text-neutral-900">
-          ← インタビュー一覧へ戻る
-        </Link>
-      </nav>
-
-      <header className="mb-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
-          {post.title}
-        </h1>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-neutral-600">
-          {post.category && (
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[11px] font-medium text-neutral-700">
-              {post.category}
-            </span>
-          )}
-          {dt && (
-            <time dateTime={dt.toISOString()} className="text-[12px] text-neutral-500">
-              {new Intl.DateTimeFormat("ja-JP", { dateStyle: "medium" }).format(dt)}
-            </time>
-          )}
-        </div>
-        {post.excerpt && <p className="mt-3 text-neutral-700">{post.excerpt}</p>}
-      </header>
-
-      {/* 動画＋時間連動CTA */}
-      <div className="container mx-auto flex space-x-4">
-        <div className="md:w-2/3 w-full">
-            <VideoWithCTAs
-            src={post.video!}
-            poster={post.thumbnail}
-            ctas={post.ctas ?? []}
-            startAt={startAt}
-            />
-        </div>
-        <SideBar
-            className="w-1/3"
-        />
-      </div>
-
-      {/* タグなど（任意） */}
-      {post.tags && post.tags.length > 0 && (
-        <div className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold text-neutral-800">タグ</h2>
-          <div className="flex flex-wrap gap-2">
-            {post.tags.map((t) => (
-              <span
-                key={t}
-                className="rounded-full border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-xs text-neutral-700"
-              >
-                #{t}
-              </span>
-            ))}
-          </div>
-        </div>
+    <Header />
+    <main className="container mx-auto px-4 py-8">
+      {post.title && (
+        <h1 className="mb-4 text-2xl font-semibold">{post.title}</h1>
       )}
+
+      <div className="flex flex-col md:flex-row md:space-x-6">
+        {/* メイン（動画） */}
+        <div className="w-full md:w-2/3">
+          <video
+            key={videoSrc}
+            className="w-full rounded-lg border"
+            src={videoSrc}
+            poster={post.thumbnail}
+            controls
+            playsInline
+            preload="metadata"
+          />
+        </div>
+
+        {/* サイドバー */}
+        <SideBar className="hidden md:block md:w-1/3 mt-6 md:mt-0" />
+      </div>
     </main>
+    <MiniFooter/>
     </>
   );
 }
