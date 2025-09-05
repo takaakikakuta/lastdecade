@@ -6,6 +6,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import VideoWithCTAs from "./video-with-ctas";
 import Header from "@/components/Header";
+import SideBar from "@/components/SideBar";
 
 export const revalidate = 3600; // 一覧と揃える
 
@@ -136,12 +137,17 @@ export default async function Page({
       </header>
 
       {/* 動画＋時間連動CTA */}
-      <div className="mb-8">
-        <VideoWithCTAs
-          src={post.video!}
-          poster={post.thumbnail}
-          ctas={post.ctas ?? []}
-          startAt={startAt}
+      <div className="container mx-auto flex space-x-4">
+        <div className="md:w-2/3 w-full">
+            <VideoWithCTAs
+            src={post.video!}
+            poster={post.thumbnail}
+            ctas={post.ctas ?? []}
+            startAt={startAt}
+            />
+        </div>
+        <SideBar
+            className="w-1/3"
         />
       </div>
 

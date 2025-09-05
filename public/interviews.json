@@ -9,5 +9,16 @@
     { "label": "AGA無料カウンセリング", "href": "https://ex.com/aga?aff=xxx", "start": 42, "end": 120 },
     { "label": "医療脱毛の詳細", "href": "https://ex.com/dep?aff=yyy", "start": 180 }
   ]
+  },
+  {
+    "slug": "interview2",
+    "title": "あおい 28歳",
+    "thumbnail": "https://lastdecade.s3.ap-northeast-1.amazonaws.com/interviews/thumbnail/Interview2_1.png",
+    "video": "https://lastdecade.s3.ap-northeast-1.amazonaws.com/interviews/video/LD_episode2.mov",
+    "date": "2025-09-05",
+     "ctas": [
+    { "label": "AGA無料カウンセリング", "href": "https://ex.com/aga?aff=xxx", "start": 42, "end": 120 },
+    { "label": "医療脱毛の詳細", "href": "https://ex.com/dep?aff=yyy", "start": 180 }
+  ]
   }
 ]

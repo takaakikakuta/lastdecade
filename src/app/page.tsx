@@ -6,6 +6,7 @@ import Hero from "@/components/Hero";
 import Interview, { InterviewItem } from "@/components/Interview";
 import Guide from "@/components/Guide";
 import { getAllPostsMeta } from "@/lib/mdx";
+import MiniFooter from "@/components/Footer";
 
 export const dynamic = "force-static";
 export const revalidate = 3600; // topics.jsonを1時間ごとに取り直す
@@ -91,6 +92,7 @@ export default async function HomePage() {
       <Hero />
       <Interview items={interviewItems} />
       <Guide items={guideItems} />
+      <MiniFooter/>
     </>
   );
 }
