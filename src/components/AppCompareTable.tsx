@@ -17,7 +17,7 @@ const defaultItems = [
       <>充実した機能で<strong>ミスマッチが少ない</strong></>,
       <>男女比率に偏りがなく<strong>マッチングしやすい</strong></>,
     ],
-    siteUrl: "https://example.com/lovean",
+    siteUrl: "https://lovean.jp/?utm_source=affiliate&utm_medium=affiliate_0001&utm_term=20250501&utm_content=affiliate_owned&mid=6487683034513408&ad=2FwbsUvwLJt",
     ctaText: "無料登録はこちら",
   },
   {
@@ -46,19 +46,6 @@ const defaultItems = [
     ],
     siteUrl: "https://example.com/paddy",
   },
-  {
-    id: "pappy",
-    rank: 3,
-    name: "パピィ",
-    rankingimg:"",
-    logo: "https://www21.a8.net/svt/bgt?aid=250903681955&wid=001&eno=01&mid=s00000009685004004000&mc=1",
-    rating: 4.3,
-    features: [
-      <>会員数<strong>130万人</strong></>,
-      <><strong>ドタキャン防止</strong>機能付き</>,
-    ],
-    siteUrl: "https://px.a8.net/svt/ejp?a8mat=45DQIP+FSKZHU+22QA+NU729",
-  },
 ];
 
 // ====== 型定義 ======
@@ -80,125 +67,187 @@ const accentMap = {
 
 // ====== コンポーネント本体 ======
 export default function AppCompareTable({
-  items = defaultItems, // ← デフォルトで内部データを使う
+  items = defaultItems,
   className = "",
   accent = "sky",
 }: Props) {
   const c = accentMap[accent];
 
   return (
-    <div
-      className={`overflow-x-auto rounded-xl bg-white shadow-sm ${className} bg-gray-400`}
-    >
-      <table className="min-w-[720px] w-full text-[15px] border-collapse my-0">
-        <thead>
-          <tr className="text-left divide-x divide-blue-600">
-            <th className={`px-4 py-3 font-semibold ${c.th} rounded-tl-xl`}>
-              おすすめパパ活アプリ
-            </th>
-            <th className={`px-4 py-3 font-semibold ${c.th}`}>総合評価</th>
-            <th className={`px-4 py-3 font-semibold ${c.th}`}>特徴</th>
-            <th className={`px-4 py-3 font-semibold ${c.th} rounded-tr-xl`}>
-              公式サイト
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-blue-600">
-          {items.map((it) => (
-            <tr
-              key={it.id}
-              className={`border-t ${c.rowBorder} hover:bg-zinc-50 transition-colors divide-x divide-blue-600`}
-            >
-              {/* アプリ名・画像 */}
-              <td className="align-top">
-                <div className="flex flex-col items-center text-center">
-                {/* ランキングバッジ（ロゴに少しかぶせる） */}
-                <div className="relative">
-                    <img
-                        src={it.logo}
-                        alt={it.name}
-                        className="object-contain rounded-lg ring-1 ring-zinc-200 bg-white shadow-sm
-                                w-12 h-12 md:w-16 md:h-16" // ← スマホは48px, md以上は64px
-                    />
-                   {it.rankingimg?.trim() && (
-                      <img
-                        src={it.rankingimg}
-                        alt={`${it.name} ranking`}
-                        className="absolute -top-6 right-3 object-contain
-                                  w-6 h-6 md:w-10 md:h-10 md:-top-9"
-                      />
-                    )}
-                </div>
+    <div className={className}>
+      {/* ✅ モバイル用（md未満） */}
+      <div className="md:hidden grid grid-cols-1 gap-2">
+        {items.map((it) => (
+          <div
+            key={it.id}
+            className="relative rounded-xl bg-white shadow-sm px-3 pb-2"
+          >
+            {/* ランクバッジ */}
+            {it.rankingimg?.trim() && (
+              <img
+                src={it.rankingimg}
+                alt={`${it.name} ranking`}
+                className="absolute -top-10 left-4 w-10 h-10 object-contain"
+              />
+            )}
 
-                {/* 名前リンク */}
-                <a
-                    href={it.siteUrl}
-                    target="_blank"
-                    rel="nofollow noopener"
-                    className="text-sm font-medium text-sky-700 hover:text-sky-900 hover:underline underline-offset-4 transition-colors"
-                >
-                    {it.name}
-                </a>
-            </div>
-
-              </td>
-
-              {/* 総合評価 */}
-              <td className="px-4 py-5 align-top">
-                <div className="font-semibold text-amber-600">
-                  {it.scoreText ?? it.rating.toFixed(1)}
-                </div>
-                <StarRating value={it.rating} className="mt-1" />
-              </td>
-
-              {/* 特徴 */}
-              <td className="px-4 py-5 align-top">
-                <ul className="space-y-1.5">
-                  {it.features.map((f, i) => (
-                    <li key={i} className="leading-relaxed">
-                      <span className="mr-1 text-zinc-400">・</span>
-                      <span className="[&_strong]:text-rose-600 [&_strong]:font-semibold">
-                        {f}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </td>
-
-              {/* 公式サイト */}
-              <td className="px-4 py-5 align-top">
+            <div className="flex items-center gap-5">
+              <img
+                src={it.logo}
+                alt={it.name}
+                className="w-14 h-14 object-contain rounded-lg ring-1 ring-zinc-200 bg-white mb-2"
+              />
+              <div className="min-w-0">
                 <a
                   href={it.siteUrl}
                   target="_blank"
                   rel="nofollow noopener"
-                  className="inline-flex items-center justify-center rounded-full px-4 py-2 text-white font-semibold shadow
-                             bg-gradient-to-b from-sky-400 to-sky-600 hover:from-sky-500 hover:to-sky-700"
+                  className="block text-base font-semibold text-sky-700 hover:underline underline-offset-4 truncate"
+                  title={it.name}
                 >
-                  {it.ctaText ?? "無料登録はこちら"}
+                  {it.name}
                 </a>
-              </td>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-amber-600 font-semibold text-sm">
+                    {(it as any).scoreText ?? it.rating.toFixed(1)}
+                  </span>
+                  <StarRating value={it.rating} />
+                </div>
+              </div>
+            </div>
+
+            {/* 特徴 */}
+            <ul className="mt-0 space-y-0.5 text-[15px] list-none">
+              {it.features?.map((f, i) => (
+                <li key={i} className="leading-2.5">
+                  <span className="mr-1 text-zinc-400">・</span>
+                  <span className="[&_strong]:text-rose-600 [&_strong]:font-semibold">
+                    {f}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            {/* CTA */}
+            <div className="mt-4">
+              <a
+                href={it.siteUrl}
+                target="_blank"
+                rel="nofollow noopener"
+                className="inline-flex w-full items-center justify-center rounded-full px-4 py-2 text-white font-semibold shadow
+                           bg-gradient-to-b from-sky-400 to-sky-600 hover:from-sky-500 hover:to-sky-700"
+              >
+                {it.ctaText ?? "無料登録はこちら"}
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ✅ デスクトップ用テーブル（md以上） */}
+      <div className="hidden md:block overflow-x-auto rounded-xl bg-white shadow-sm">
+        <table className="min-w-[720px] w-full text-[15px] border-collapse my-0">
+          <thead>
+            <tr className="text-left divide-x divide-blue-600">
+              <th className={`px-4 py-3 font-semibold ${c.th} rounded-tl-xl`}>
+                おすすめパパ活アプリ
+              </th>
+              <th className={`px-4 py-3 font-semibold ${c.th}`}>総合評価</th>
+              <th className={`px-4 py-3 font-semibold ${c.th}`}>特徴</th>
+              <th className={`px-4 py-3 font-semibold ${c.th} rounded-tr-xl`}>
+                公式サイト
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-blue-600">
+            {items.map((it) => (
+              <tr
+                key={it.id}
+                className={`border-t ${c.rowBorder} hover:bg-zinc-50 transition-colors divide-x divide-blue-600`}
+              >
+                {/* アプリ名・画像 */}
+                <td className="align-top">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative">
+                      <img
+                        src={it.logo}
+                        alt={it.name}
+                        className="object-contain rounded-lg ring-1 ring-zinc-200 bg-white shadow-sm
+                                   w-12 h-12 md:w-16 md:h-16"
+                      />
+                      {it.rankingimg?.trim() && (
+                        <img
+                          src={it.rankingimg}
+                          alt={`${it.name} ranking`}
+                          className="absolute -top-6 right-3 object-contain
+                                     w-6 h-6 md:w-10 md:h-10 md:-top-9"
+                        />
+                      )}
+                    </div>
+                    <a
+                      href={it.siteUrl}
+                      target="_blank"
+                      rel="nofollow noopener"
+                      className="text-sm font-medium text-sky-700 hover:text-sky-900 hover:underline underline-offset-4 transition-colors"
+                    >
+                      {it.name}
+                    </a>
+                  </div>
+                </td>
+
+                {/* 総合評価 */}
+                <td className="px-4 py-5 align-top">
+                  <div className="font-semibold text-amber-600">
+                    {(it as any).scoreText ?? it.rating.toFixed(1)}
+                  </div>
+                  <StarRating value={it.rating} className="mt-1" />
+                </td>
+
+                {/* 特徴 */}
+                <td className="px-4 py-5 align-top">
+                  <ul className="space-y-1.5">
+                    {it.features?.map((f, i) => (
+                      <li key={i} className="leading-relaxed">
+                        <span className="mr-1 text-zinc-400">・</span>
+                        <span className="[&_strong]:text-rose-600 [&_strong]:font-semibold">
+                          {f}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </td>
+
+                {/* 公式サイト */}
+                <td className="px-4 py-5 align-top">
+                  <a
+                    href={it.siteUrl}
+                    target="_blank"
+                    rel="nofollow noopener"
+                    className="inline-flex items-center justify-center rounded-full px-4 py-2 text-white font-semibold shadow
+                               bg-gradient-to-b from-sky-400 to-sky-600 hover:from-sky-500 hover:to-sky-700"
+                  >
+                    {it.ctaText ?? "無料登録はこちら"}
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
 
-// ====== 星評価表示 ======
+// ====== 星評価表示（あなたの実装を流用） ======
 function StarRating({ value, className = "" }: { value: number; className?: string }) {
   const full = Math.floor(value);
   const half = value - full >= 0.5 ? 1 : 0;
   const empty = 5 - full - half;
   return (
     <div className={`flex items-center gap-0.5 ${className}`}>
-      {Array.from({ length: full }).map((_, i) => (
-        <Star key={`f${i}`} type="full" />
-      ))}
+      {Array.from({ length: full }).map((_, i) => <Star key={`f${i}`} type="full" />)}
       {half === 1 && <Star key="half" type="half" />}
-      {Array.from({ length: empty }).map((_, i) => (
-        <Star key={`e${i}`} type="empty" />
-      ))}
+      {Array.from({ length: empty }).map((_, i) => <Star key={`e${i}`} type="empty" />)}
     </div>
   );
 }
@@ -208,9 +257,7 @@ function Star({ type }: { type: "full" | "half" | "empty" }) {
   if (type === "full")
     return (
       <svg viewBox="0 0 20 20" className={`${common} text-amber-400`} aria-hidden>
-        <path d="M10 1.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1L10 15.7l-5.4 2.8 1-6.1L1.2 8 7.3 7l2.7-5.5z"
-         fill="currentColor"   // ★追加
-         />
+        <path d="M10 1.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1L10 15.7l-5.4 2.8 1-6.1L1.2 8 7.3 7l2.7-5.5z" fill="currentColor" />
       </svg>
     );
   if (type === "half")
@@ -222,20 +269,12 @@ function Star({ type }: { type: "full" | "half" | "empty" }) {
             <stop offset="50%" stopColor="transparent" />
           </linearGradient>
         </defs>
-        <path
-          d="M10 1.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1L10 15.7l-5.4 2.8 1-6.1L1.2 8 7.3 7l2.7-5.5z"
-          fill="url(#halfGrad)"
-          stroke="currentColor"
-        />
+        <path d="M10 1.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1L10 15.7l-5.4 2.8 1-6.1L1.2 8 7.3 7l2.7-5.5z" fill="url(#halfGrad)" stroke="currentColor" />
       </svg>
     );
   return (
     <svg viewBox="0 0 20 20" className={`${common} text-amber-300/40`} aria-hidden>
-      <path
-        d="M10 1.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1L10 15.7l-5.4 2.8 1-6.1L1.2 8 7.3 7l2.7-5.5z"
-        fill="none"
-        stroke="currentColor"
-      />
+      <path d="M10 1.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1L10 15.7l-5.4 2.8 1-6.1L1.2 8 7.3 7l2.7-5.5z" fill="none" stroke="currentColor" />
     </svg>
   );
 }

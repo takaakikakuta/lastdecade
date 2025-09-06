@@ -1,4 +1,4 @@
-// app/manual/[...slug]/page.tsx  ← キャッチオール
+// app/manual/[...slug]/page.tsx
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
@@ -16,10 +16,8 @@ import ManualSectionsSidebar from "@/components/ManualSectionsSidebar";
 import { ServiceCard } from "@/components/app/LoveanComponent"; 
 import RelatedArticles from "@/components/RelatedArticles";
 
-// 記事格納ディレクトリ
 const CONTENT_DIR = path.join(process.cwd(), "src", "content", "topics");
 
-// 動的パス生成（サブディレクトリ対応）
 export async function generateStaticParams() {
   const walk = (dir: string, parent: string[] = []): { slug: string[] }[] => {
     if (!fs.existsSync(dir)) return [];
@@ -28,10 +26,10 @@ export async function generateStaticParams() {
       const rel = [...parent, file.replace(/\.mdx$/, "")];
 
       if (fs.statSync(fullPath).isDirectory()) {
-        return walk(fullPath, rel); // 階層を深掘り
+        return walk(fullPath, rel);
       }
       if (file.endsWith(".mdx")) {
-        return [{ slug: rel }]; // [...slug] なので配列でOK
+        return [{ slug: rel }];
       }
       return [];
     });
@@ -39,27 +37,31 @@ export async function generateStaticParams() {
   return walk(CONTENT_DIR);
 }
 
-// ページ本体
 export default async function ArticlePage({
   params,
 }: {
-  // ★ Next.js 15 では Promise で来る
   params: Promise<{ slug: string[] }>;
 }) {
-  const { slug: slugArray } = await params; // ← ここを await
+  const { slug: slugArray } = await params;
 
-  // ✅ 配列を join してファイルパスを作る
   const filePath = path.join(CONTENT_DIR, ...slugArray) + ".mdx";
-
   if (!fs.existsSync(filePath)) return notFound();
 
   const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
 
-  // MDXコンパイル
   const { content: mdxContent } = await compileMDX({
     source: content,
-    components: { CalloutList, AppCompareTable, InlineToc, CleanOjiAffiliateCard,  ServiceCard, Image, Link,RelatedArticles }, // MDX内で使用可
+    components: { 
+      CalloutList, 
+      AppCompareTable, 
+      InlineToc, 
+      CleanOjiAffiliateCard,  
+      ServiceCard, 
+      Image, 
+      Link,
+      RelatedArticles 
+    },
     options: { parseFrontmatter: false },
   });
 
@@ -76,11 +78,20 @@ export default async function ArticlePage({
           {typeof data?.date === "string" && (
             <time className="block text-sm text-zinc-500 mt-1">{data.date}</time>
           )}
+
+          {/* ✅ 全記事でPR表記を表示 */}
+          <div
+            className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
+            role="note"
+            aria-label="PR disclosure"
+          >
+            ※本記事にはPR（アフィリエイトリンク）が含まれています。
+          </div>
         </header>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <article className="prose prose-zinc max-w-none lg:col-span-2">{mdxContent}</article>
-          <ManualSectionsSidebar/>
+          <ManualSectionsSidebar />
         </div>
       </div>
     </>
