@@ -17,6 +17,7 @@ export type ServiceCardProps = {
   };
   ageRange: { female: string; male: string };
   incomeProof: string;          // 例: "あり"
+  receipt?: string; // ← 領収書発行を追加
   features: string[];           // 箇条書き
   company: string;              // 例: "株式会社Bluebors"
   officialUrl: string;
@@ -31,6 +32,7 @@ export function ServiceCard({
   pricing,
   ageRange,
   incomeProof,
+  receipt,
   features,
   company,
   officialUrl,
@@ -93,7 +95,11 @@ export function ServiceCard({
                 }
               />
 
-              <TableRow label="年収証明" value={incomeProof} />
+              {/* 年収証明 */}
+              {incomeProof && <TableRow label="年収証明" value={incomeProof} />}
+
+              {/* 領収書発行 */}
+              {receipt && <TableRow label="領収書発行" value={receipt} />}
 
               <TableRow
                 label="特徴"

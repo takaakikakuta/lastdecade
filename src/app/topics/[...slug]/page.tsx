@@ -9,10 +9,12 @@ import Header from "@/components/Header";
 import CalloutList from "@/components/CalloutList";
 import AppCompareTable from "@/components/AppCompareTable";
 import Image from "next/image";
+import Link from "next/link";
 import CleanOjiAffiliateCard from "@/components/adComponent/CleanOjiAffiliateCard";
 import InlineToc from "@/components/InlineToc";
 import ManualSectionsSidebar from "@/components/ManualSectionsSidebar";
 import { ServiceCard } from "@/components/app/LoveanComponent"; 
+import RelatedArticles from "@/components/RelatedArticles";
 
 // 記事格納ディレクトリ
 const CONTENT_DIR = path.join(process.cwd(), "src", "content", "topics");
@@ -57,7 +59,7 @@ export default async function ArticlePage({
   // MDXコンパイル
   const { content: mdxContent } = await compileMDX({
     source: content,
-    components: { CalloutList, AppCompareTable, InlineToc, CleanOjiAffiliateCard,  ServiceCard, Image }, // MDX内で使用可
+    components: { CalloutList, AppCompareTable, InlineToc, CleanOjiAffiliateCard,  ServiceCard, Image, Link,RelatedArticles }, // MDX内で使用可
     options: { parseFrontmatter: false },
   });
 

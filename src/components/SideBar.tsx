@@ -50,9 +50,9 @@ export default function SideBar({ className = "" }: { className?: string }) {
     <aside className={`space-y-6 ${className}`}>
       {/* 新着記事 */}
       <section className="rounded-2xl border bg-white p-5 shadow-sm">
-        <h3 className="text-lg font-semibold mb-3">新着記事</h3>
+        <h3 className="text-lg font-semibold mb-3">人気記事</h3>
         <ul className="space-y-3">
-          {recent.map((a) => (
+          {popular.map((a) => (
             <li key={a.slug} className="flex gap-3">
               <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
                 {a.cover ? (
@@ -87,21 +87,35 @@ export default function SideBar({ className = "" }: { className?: string }) {
 
       {/* 人気記事 */}
       <section className="rounded-2xl border bg-white p-5 shadow-sm">
-        <h3 className="text-lg font-semibold mb-3">人気記事</h3>
+        <h3 className="text-lg font-semibold mb-3">新着記事</h3>
         <ul className="space-y-2">
-          {popular.map((a, i) => (
-            <li key={a.slug} className="flex items-start gap-2">
-              <span className="mt-0.5 text-xs w-5 text-zinc-500">{i + 1}.</span>
+          {recent.map((a) => (
+            <li key={a.slug} className="flex gap-3">
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
+                {a.cover ? (
+                  <Image
+                    src={a.cover}
+                    alt={a.title}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <span className="absolute inset-0 grid place-items-center text-xs text-zinc-400">
+                    No img
+                  </span>
+                )}
+              </div>
               <div className="min-w-0">
                 <Link
-                  href={`/articles/${a.slug}`}
+                  // ルーティングに合わせて /articles か /topics に変更
+                  href={`/topics/${a.slug}`}
                   className="line-clamp-2 hover:underline underline-offset-4"
                 >
                   {a.title}
                 </Link>
-                <div className="text-xs text-zinc-500">
-                  {typeof a.views === "number" ? `${a.views.toLocaleString()} views` : (a.date ?? "")}
-                </div>
+                {a.date && (
+                  <div className="text-xs text-zinc-500 mt-0.5">{a.date}</div>
+                )}
               </div>
             </li>
           ))}

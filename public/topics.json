@@ -9,7 +9,8 @@
     "category": "注意点",
     "readMinutes": 12,
     "author": "編集部",
-    "words": 5200
+    "words": 5200,
+    "views":0
   },
   {
     "slug": "topics2",
@@ -19,7 +20,8 @@
     "date": "2025-08-12",
     "category": "リスク対策",
     "tags": ["注意点", "体験談"],
-    "words": 1000
+    "words": 1000,
+    "views":5
   },
   {
     "slug": "topics3",
@@ -29,7 +31,8 @@
     "date": "2025-09-02",
     "category": "コラム",
     "tags": ["パパ活", "風俗", "境界線", "違い"],
-    "words": 1000
+    "words": 1000,
+    "views":4
   },
   {
     "slug": "topics4",
@@ -79,7 +82,8 @@
     "date": "2025-09-07",
     "category": "コラム",
     "tags": ["パパ活", "地方", "田舎", "注意点"],
-    "words": 1000
+    "words": 1000,
+    "views":3
   },
   {
     "slug": "topics9",
@@ -159,7 +163,8 @@
     "date": "2025-09-15",
     "category": "コラム",
     "tags": ["パパ活アプリ", "ラブアン", "特徴", "比較ガイド"],
-    "words": 1000
+    "words": 1000,
+    "views":3
   },
   {
     "slug": "topics17",
@@ -179,6 +184,7 @@
     "date": "2025-09-17",
     "category": "コラム",
     "tags": ["パパ活", "ガチ恋", "リスク管理", "実践ガイド", "男性向け"],
-    "words": 1000
+    "words": 1000,
+    "views":6
   }
 ]

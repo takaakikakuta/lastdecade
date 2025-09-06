@@ -2,17 +2,25 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-type Heading = { id: string; text: string; level: 2 | 3 };
+type Accent = "sky" | "cyan" | "emerald" | "blue";
+type Heading = { id: string; text: string; level: 2 | 3; index: number };
+
+type Props = {
+  title?: string;
+  /** 固定ヘッダー分ずらす */
+  scrollOffset?: number;
+  /** 配色 */
+  accent?: Accent;
+  /** 目次対象ルート（無い場合は body） */
+  rootSelector?: string;
+};
 
 export default function InlineToc({
   title = "Contents",
-  scrollOffset = 72,          // 固定ヘッダー分ずらす
-  accent = "sky",             // "sky" | "cyan" | "emerald" | "blue"
-}: {
-  title?: string;
-  scrollOffset?: number;
-  accent?: "sky" | "cyan" | "emerald" | "blue";
-}) {
+  scrollOffset = 72,
+  accent = "sky",
+  rootSelector = "[data-article-root]",
+}: Props) {
   const [heads, setHeads] = useState<Heading[]>([]);
   const [active, setActive] = useState<string | null>(null);
 
@@ -23,68 +31,98 @@ export default function InlineToc({
     blue:    { border: "border-blue-300", ring: "ring-blue-100", title: "text-blue-600", hr: "border-blue-200", dot: "bg-blue-500" },
   }[accent];
 
-  // 記事ルート（page.tsx側で data-article-root を付ける）
   const getRoot = () =>
-    (document.querySelector("[data-article-root]") as HTMLElement | null) ?? document.body;
+    (document.querySelector(rootSelector) as HTMLElement | null) ?? document.body;
 
-  // 見出しを収集（h2/h3）。IDがなければ付与 & scroll-margin 設定
+  // 見出し収集（ID付与・scroll-margin 設定）
   useEffect(() => {
     const root = getRoot();
     if (!root) return;
 
-    const hs = Array.from(root.querySelectorAll("h2, h3")) as HTMLElement[];
-    const list: Heading[] = [];
-    const slug = (s: string) =>
+    const nodes = Array.from(root.querySelectorAll<HTMLElement>("h2, h3"));
+    const slugify = (s: string) =>
       s
         .toLowerCase()
+        .trim()
         .replace(/\s+/g, "-")
         .replace(/[^\w\-ぁ-んァ-ン一-龥]/g, "")
         .replace(/\-+/g, "-");
 
-    hs.forEach((el) => {
+    const list: Heading[] = [];
+    nodes.forEach((el, i) => {
       const level = el.tagName.toLowerCase() === "h2" ? 2 : (3 as 3);
       const text = (el.textContent ?? "").trim();
       if (!text) return;
+
       if (!el.id) {
-        const base = slug(text) || "section";
+        const base = slugify(text) || "section";
         let id = base;
-        let i = 2;
-        while (document.getElementById(id)) id = `${base}-${i++}`;
+        let n = 2;
+        while (document.getElementById(id)) id = `${base}-${n++}`;
         el.id = id;
       }
+
+      // スクロール時の被り対策
       el.style.scrollMarginTop = `${scrollOffset + 8}px`;
-      list.push({ id: el.id, text, level });
+      list.push({ id: el.id, text, level, index: i });
     });
 
     setHeads(list);
-  }, [scrollOffset]);
+  }, [rootSelector, scrollOffset]);
 
-  // 現在地ハイライト
+  // 現在地ハイライト（IntersectionObserver）
   useEffect(() => {
     const root = getRoot();
-    if (!root) return;
-    const targets = Array.from(root.querySelectorAll("h2, h3")) as HTMLElement[];
+    if (!root || heads.length === 0) return;
+
+    const targets = heads
+      .map((h) => document.getElementById(h.id))
+      .filter(Boolean) as Element[];
 
     const io = new IntersectionObserver(
-      (ents) => {
-        const v = ents
+      (entries) => {
+        // 画面上に見えている順にソートして先頭を active に
+        const vis = entries
           .filter((e) => e.isIntersecting)
-          .sort((a, b) => (a.target as HTMLElement).offsetTop - (b.target as HTMLElement).offsetTop);
-        if (v[0]) setActive((v[0].target as HTMLElement).id);
+          .sort(
+            (a, b) =>
+              (a.target as HTMLElement).getBoundingClientRect().top -
+              (b.target as HTMLElement).getBoundingClientRect().top
+          );
+        if (vis[0]) setActive((vis[0].target as HTMLElement).id);
+        // もし何も可視でなければ、スクロール位置に近い先頭の h2/h3 を推測
+        if (vis.length === 0) {
+          const y = window.scrollY + scrollOffset + 16;
+          let fallback: string | null = null;
+          for (const h of heads) {
+            const el = document.getElementById(h.id);
+            if (!el) continue;
+            const top = el.offsetTop;
+            if (top <= y) fallback = h.id;
+            else break;
+          }
+          if (fallback) setActive(fallback);
+        }
       },
-      { rootMargin: `-${scrollOffset + 4}px 0px -70% 0px`, threshold: [0, 1] }
+      {
+        // 上部はオフセット分広げ、下は60%で抜けたら次を拾う
+        rootMargin: `-${scrollOffset + 8}px 0px -60% 0px`,
+        threshold: 0.1,
+      }
     );
+
     targets.forEach((t) => io.observe(t));
     return () => io.disconnect();
-  }, [scrollOffset, heads.length]);
+  }, [heads, rootSelector, scrollOffset]);
 
-  // h2だけ番号付け、h3はドット
+  // h2に番号を振る（必要ならUIに活用できる）
   const numbered = useMemo(() => {
     let n = 0;
     return heads.map((h) => ({ ...h, no: h.level === 2 ? ++n : undefined }));
   }, [heads]);
 
-  const j = (id: string) => (e: React.MouseEvent) => {
+  // スムーススクロール
+  const jump = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
@@ -102,46 +140,54 @@ export default function InlineToc({
         <div className={`mt-3 border-b ${color.hr}`} />
       </div>
 
-      <nav className="mt-2 md:mt-4">
+      <nav className="mt-2 md:mt-4" aria-label="Table of contents">
         <ol className="space-y-0">
           {numbered
             .filter((h) => h.level === 2)
-            .map((h2) => (
-              <li key={h2.id} className="">
-                <a href={`#${h2.id}`} onClick={j(h2.id)} className="flex items-start gap-3 group">
-                  <span className={`leading-relaxed underline-offset-4 group-hover:underline ${active === h2.id ? "text-zinc-900" : "text-zinc-700"}`}>
-                    {h2.text}
-                  </span>
-                </a>
+            .map((h2) => {
+              // 親 h2 の次の位置から、次の h2 直前までを「その子範囲」として切る（元配列 heads 基準）
+              const start = heads.findIndex((x) => x.id === h2.id) + 1;
+              const nextH2 = heads.findIndex((x, i) => i >= start && x.level === 2);
+              const end = nextH2 === -1 ? heads.length : nextH2;
+              const children = heads.slice(start, end).filter((x) => x.level === 3);
 
-                {/* h3 */}
-                <ul className="mt-2 ml-9 space-y-1.5">
-                  {numbered
-                    .filter((x) => x.level === 3)
-                    .slice(
-                      // h2 から次の h2 直前までを子とする
-                      heads.findIndex((x) => x.id === h2.id) + 1,
-                      (() => {
-                        const start = heads.findIndex((x) => x.id === h2.id) + 1;
-                        const next = heads.findIndex((x, i) => i > start - 1 && x.level === 2);
-                        return next === -1 ? heads.length : next;
-                      })()
-                    )
-                    .map((h3) => (
-                      <li key={h3.id}>
-                        <a
-                          href={`#${h3.id}`}
-                          onClick={j(h3.id)}
-                          className={`inline-flex items-start gap-2 ${active === h3.id ? "text-zinc-900" : "text-zinc-700"}`}
-                        >
-                          <span className={`mt-2 h-1.5 w-1.5 rounded-full ${color.dot}`} />
-                          <span className="underline-offset-4 hover:underline">{h3.text}</span>
-                        </a>
-                      </li>
-                    ))}
-                </ul>
-              </li>
-            ))}
+              return (
+                <li key={h2.id}>
+                  <a
+                    href={`#${h2.id}`}
+                    onClick={jump(h2.id)}
+                    className="flex items-start gap-3 group"
+                  >
+                    <span
+                      className={`leading-relaxed underline-offset-4 group-hover:underline ${
+                        active === h2.id ? "text-zinc-900" : "text-zinc-700"
+                      }`}
+                    >
+                      {h2.text}
+                    </span>
+                  </a>
+
+                  {children.length > 0 && (
+                    <ul className="mt-2 ml-9 space-y-1.5">
+                      {children.map((h3) => (
+                        <li key={h3.id}>
+                          <a
+                            href={`#${h3.id}`}
+                            onClick={jump(h3.id)}
+                            className={`inline-flex items-start gap-2 ${
+                              active === h3.id ? "text-zinc-900" : "text-zinc-700"
+                            }`}
+                          >
+                            <span className={`mt-2 h-1.5 w-1.5 rounded-full ${color.dot}`} />
+                            <span className="underline-offset-4 hover:underline">{h3.text}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
         </ol>
       </nav>
     </aside>
